@@ -2,7 +2,15 @@ package config
 
 type New struct {
 	App        AppConfig        `mapstructure:"app"`
+	HTTP       HttpConfig       `mapstructure:"http"`
 	Middleware MiddlewareConfig `mapstructure:"middleware"`
+}
+
+type HttpConfig struct {
+	ReadTimeout    int `mapstructure:"readTimeout"`
+	WriteTimeout   int `mapstructure:"writeTimeout"`
+	IdleTimeout    int `mapstructure:"idleTimeout"`
+	MaxHeaderBytes int `mapstructure:"maxHeaderBytes"`
 }
 
 type AppConfig struct {
@@ -14,8 +22,7 @@ type AppConfig struct {
 }
 
 type LogConfig struct {
-	Level  string `mapstructure:"level"`
-	Format string `mapstructure:"format"`
+	Level string `mapstructure:"level"`
 }
 
 type MiddlewareConfig struct {

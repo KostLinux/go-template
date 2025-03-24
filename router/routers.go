@@ -8,23 +8,18 @@ import (
 	"github.com/gin-gonic/gin"
 )
 
-type Router struct {
-	engine      *gin.Engine
-	config      *config.New
-	controllers controller.Controllers
-}
-
 func New(cfg *config.New, controllers controller.Controllers) *gin.Engine {
 	// Create new router instance
 	router := gin.Default()
+	router.Use(middleware.Logger())
 
 	// Apply middleware if enabled in config
 	if cfg.Middleware.Cors.Enabled {
-		router.Use(middleware.Cors(router, cfg))
+		router.Use(middleware.Cors(cfg))
 	}
 
 	if cfg.Middleware.Csrf.Enabled {
-		router.Use(middleware.Csrf(router, cfg))
+		router.Use(middleware.Csrf(cfg))
 	}
 
 	// Setup routes

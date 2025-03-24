@@ -3,12 +3,13 @@ package middleware
 import (
 	"go-template/config"
 	"go-template/pkg/stringify"
+	"net/http"
 	"strings"
 
 	"github.com/gin-gonic/gin"
 )
 
-func Cors(router *gin.Engine, cfg *config.New) gin.HandlerFunc {
+func Cors(cfg *config.New) gin.HandlerFunc {
 	return func(ctx *gin.Context) {
 		// Convert slice to string with comma separation
 		origins := strings.Join(cfg.Middleware.Cors.AllowOrigins, ",")
@@ -23,7 +24,7 @@ func Cors(router *gin.Engine, cfg *config.New) gin.HandlerFunc {
 		ctx.Writer.Header().Set("Access-Control-Allow-Credentials", stringify.BoolToString(cfg.Middleware.Cors.AllowCredentials))
 		ctx.Writer.Header().Set("Access-Control-Max-Age", stringify.ToInteger(cfg.Middleware.Cors.MaxAge))
 
-		if ctx.Request.Method == "OPTIONS" {
+		if ctx.Request.Method == http.MethodOptions {
 			ctx.AbortWithStatus(200)
 			return
 		}

@@ -5,7 +5,12 @@ app:
   env: "development"
   log:
     level: "debug"
-    format: "json"
+
+http:
+  readTimeout: 30
+  writeTimeout: 30
+  idleTimeout: 30
+  maxHeaderBytes: 1
 
 middleware:
   cors:

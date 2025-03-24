@@ -4,11 +4,13 @@ import (
 	"fmt"
 	"go-template/config"
 	"go-template/controller"
+	"go-template/pkg/logger"
 	"go-template/pkg/server"
 	"go-template/router"
 	"log"
 	"net/http"
 	"os"
+	"time"
 
 	"github.com/gin-gonic/gin"
 )
@@ -18,6 +20,12 @@ func main() {
 	cfg, err := config.LoadConfig()
 	if err != nil {
 		log.Printf("Error loading config: %v", err)
+		os.Exit(1)
+	}
+
+	// Initialize logger
+	if err := logger.Setup(cfg); err != nil {
+		log.Printf("Error initializing logger: %v", err)
 		os.Exit(1)
 	}
 
@@ -34,15 +42,20 @@ func main() {
 
 	// Create server
 	srv := &http.Server{
-		Addr:    fmt.Sprintf(":%d", cfg.App.Port),
-		Handler: router,
+		Addr:              fmt.Sprintf(":%d", cfg.App.Port),
+		Handler:           router,
+		ReadTimeout:       time.Duration(cfg.HTTP.ReadTimeout) * time.Second,
+		WriteTimeout:      time.Duration(cfg.HTTP.WriteTimeout) * time.Second,
+		IdleTimeout:       time.Duration(cfg.HTTP.IdleTimeout) * time.Second,
+		ReadHeaderTimeout: time.Duration(cfg.HTTP.ReadTimeout) * time.Second,
+		MaxHeaderBytes:    cfg.HTTP.MaxHeaderBytes << 20,
 	}
 
 	// Start server in goroutine
 	go func() {
-		log.Printf("Starting server on %s in %s mode", srv.Addr, cfg.App.Env)
+		logger.Infof("Starting server on %s in %s mode", srv.Addr, cfg.App.Env)
 		if err := srv.ListenAndServe(); err != nil && err != http.ErrServerClosed {
-			log.Printf("Server error: %v", err)
+			logger.Errorf("Server failed to start: %v", err)
 			os.Exit(1)
 		}
 	}()
