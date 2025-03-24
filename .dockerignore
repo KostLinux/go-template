@@ -1,0 +1,5 @@
+.git
+.gitignore
+postgres-data
+README.md
+*.md

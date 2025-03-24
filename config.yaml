@@ -1,7 +1,7 @@
 app:
   name: "go-web"
   version: "1.0.0"
-  port: 8085
+  port: 8080
   env: "development"
   log:
     level: "debug"
@@ -15,11 +15,14 @@ http:
 database:
   # driver: "mysql" or "postgresql"
   driver: "postgresql"
-  host: "localhost"
-  port: 3306
+  # use host: "db" if you are using docker-compose
+  host: "db"
+  port: 5432
   user: "root"
   password: "root"
   name: "go_web"
+  # Put SSL Mode to require for production environments
+  sslMode: "disable"
 
 middleware:
   cors:

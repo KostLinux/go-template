@@ -1,0 +1,67 @@
+## Ensure that docker compose has same values as config.yaml
+services:
+  api:
+    build:
+      context: .
+      dockerfile: Dockerfile
+    volumes:
+      - .:/app
+      - ./config.yaml:/app/config.yaml
+      - ./.air.toml:/app/.air.toml
+    ports:
+      - "8085:8085"
+    environment:
+      - APP_ENV=development
+    entrypoint: >
+      sh -c "
+        go install github.com/air-verse/air@latest &&
+        air -c .air.toml
+      "
+    depends_on:
+      db:
+        condition: service_healthy
+      migrations:
+        condition: service_completed_successfully
+    restart: unless-stopped
+    networks:
+      - app-network
+
+  db:
+    image: postgres:14-alpine
+    environment:
+      - POSTGRES_DB=go_web
+      - POSTGRES_USER=root
+      - POSTGRES_PASSWORD=root
+    ports:
+      - "5432:5432"
+    volumes:
+      - ./postgres-data:/var/lib/postgresql/data
+    healthcheck:
+      test: ["CMD-SHELL", "pg_isready -U root -d go_web"]
+      interval: 5s
+      timeout: 5s
+      retries: 5
+      start_period: 10s
+    restart: unless-stopped
+    networks:
+      - app-network
+
+  migrations:
+    build:
+      context: .
+      dockerfile: dev.Dockerfile
+    command: > 
+      sh -c "goose -dir ./migrations postgres 'user=root password=root host=db port=5432 dbname=go_web sslmode=disable' up"
+    depends_on:
+      db:
+        condition: service_healthy
+    networks:
+      - app-network
+
+volumes:
+  postgres-data:
+    name: go_web_postgres_data
+
+networks:
+  app-network:
+    driver: bridge

@@ -19,7 +19,7 @@ type Database interface {
 // NewConnection creates a new database connection based on driver
 func NewConnection(cfg *config.DatabaseConfig) (Database, error) {
 	switch cfg.Driver {
-	case "postgres":
+	case "postgresql":
 		return NewPostgreSQL(cfg), nil
 	case "mysql":
 		return NewMySQL(cfg), nil
