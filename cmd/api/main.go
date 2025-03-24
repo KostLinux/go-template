@@ -1,9 +1,11 @@
 package main
 
 import (
+	"context"
 	"fmt"
 	"go-template/config"
 	"go-template/controller"
+	"go-template/pkg/database"
 	"go-template/pkg/logger"
 	"go-template/pkg/server"
 	"go-template/router"
@@ -50,6 +52,26 @@ func main() {
 		ReadHeaderTimeout: time.Duration(cfg.HTTP.ReadTimeout) * time.Second,
 		MaxHeaderBytes:    cfg.HTTP.MaxHeaderBytes << 20,
 	}
+
+	db, err := database.NewConnection(&cfg.Database)
+	if err != nil {
+		logger.Errorf("Failed to create database connection: %v", err)
+		os.Exit(1)
+	}
+
+	if err := db.Connect(); err != nil {
+		logger.Errorf("Failed to connect to database: %v", err)
+		os.Exit(1)
+	}
+	defer db.Close()
+
+	// Test connection
+	if err := db.Ping(context.Background()); err != nil {
+		logger.Errorf("Database health check failed: %v", err)
+		os.Exit(1)
+	}
+
+	logger.Infof("Database connection established successfully")
 
 	// Start server in goroutine
 	go func() {

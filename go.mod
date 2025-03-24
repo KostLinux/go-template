@@ -4,12 +4,16 @@ go 1.24.1
 
 require (
 	github.com/gin-gonic/gin v1.10.1-0.20250320154041-8763f33c65f7
+	github.com/go-sql-driver/mysql v1.9.1
 	github.com/google/uuid v1.6.0
+	github.com/jmoiron/sqlx v1.4.0
+	github.com/lib/pq v1.10.9
 	github.com/spf13/viper v1.20.0
 	go.uber.org/zap v1.27.0
 )
 
 require (
+	filippo.io/edwards25519 v1.1.0 // indirect
 	github.com/bytedance/sonic v1.13.2 // indirect
 	github.com/bytedance/sonic/loader v0.2.4 // indirect
 	github.com/cloudwego/base64x v0.1.5 // indirect

@@ -3,7 +3,18 @@ package config
 type New struct {
 	App        AppConfig        `mapstructure:"app"`
 	HTTP       HttpConfig       `mapstructure:"http"`
+	Database   DatabaseConfig   `mapstructure:"database"`
 	Middleware MiddlewareConfig `mapstructure:"middleware"`
+}
+
+type DatabaseConfig struct {
+	Driver   string `mapstructure:"driver"`
+	Host     string `mapstructure:"host"`
+	Port     int    `mapstructure:"port"`
+	User     string `mapstructure:"user"`
+	Password string `mapstructure:"password"`
+	Name     string `mapstructure:"name"`
+	SSLMode  string `mapstructure:"sslMode"`
 }
 
 type HttpConfig struct {

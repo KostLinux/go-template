@@ -12,6 +12,15 @@ http:
   idleTimeout: 30
   maxHeaderBytes: 1
 
+database:
+  # driver: "mysql" or "postgresql"
+  driver: "postgresql"
+  host: "localhost"
+  port: 3306
+  user: "root"
+  password: "root"
+  name: "go_web"
+
 middleware:
   cors:
     enabled: true
