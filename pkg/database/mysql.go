@@ -3,6 +3,7 @@ package database
 import (
 	"context"
 	"fmt"
+
 	"go-template/config"
 
 	_ "github.com/go-sql-driver/mysql"
@@ -14,31 +15,31 @@ type MySQL struct {
 	cfg *config.DatabaseConfig
 }
 
-func NewMySQL(cfg *config.DatabaseConfig) Database {
+func NewMySQL(cfg *config.DatabaseConfig) *MySQL {
 	return &MySQL{cfg: cfg}
 }
 
-func (m *MySQL) Connect() error {
+func (mysql *MySQL) Connect() error {
 	dsn := fmt.Sprintf("%s:%s@tcp(%s:%d)/%s",
-		m.cfg.User, m.cfg.Password, m.cfg.Host, m.cfg.Port, m.cfg.Name)
+		mysql.cfg.User, mysql.cfg.Password, mysql.cfg.Host, mysql.cfg.Port, mysql.cfg.Name)
 
 	db, err := sqlx.Connect("mysql", dsn)
 	if err != nil {
 		return fmt.Errorf("failed to connect to mysql: %w", err)
 	}
 
-	m.db = db
+	mysql.db = db
 	return nil
 }
 
-func (m *MySQL) Close() error {
-	return m.db.Close()
+func (mysql *MySQL) Close() error {
+	return mysql.db.Close()
 }
 
-func (m *MySQL) Ping(ctx context.Context) error {
-	return m.db.PingContext(ctx)
+func (mysql *MySQL) Ping(ctx context.Context) error {
+	return mysql.db.PingContext(ctx)
 }
 
-func (m *MySQL) GetDB() *sqlx.DB {
-	return m.db
+func (mysql *MySQL) GetDB() *sqlx.DB {
+	return mysql.db
 }

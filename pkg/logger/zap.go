@@ -2,6 +2,7 @@ package logger
 
 import (
 	"fmt"
+
 	"go-template/config"
 
 	"go.uber.org/zap"

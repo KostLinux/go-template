@@ -1,10 +1,28 @@
 # Go API Template
 
-Template repository for different golang projects based on MVC Layered Architecture and HTTP RESTful API.
+Cloud production ready template repository for different golang projects based on MVC Layered Architecture and HTTP RESTful API.
 
 Built on top of [Gin-Gonic](https://github.com/gin-gonic/gin) framework.
 
 The application is built using Cloud Native Application best practices.
+
+## Includes
+
+- MVC Layered Architecture
+- Middleware CORS & CSRF, Logger, Recovery
+- Example API (Users API)
+- Swagger Docs
+- Configuration Management
+- Database Connections
+    - MySQL
+    - PostgreSQL
+- Container Orchestration
+    - Docker
+    - Docker Compose
+- Mappers
+- Request & Response Models
+- Hot Reload for Development (Air)
+- Migrations
 
 ## Getting Started
 

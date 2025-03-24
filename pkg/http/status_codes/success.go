@@ -12,3 +12,17 @@ func OK(ctx *gin.Context, message interface{}) {
 		"message": message,
 	})
 }
+
+func Created(ctx *gin.Context, message interface{}) {
+	ctx.JSON(http.StatusCreated, gin.H{
+		"code":    "CREATED",
+		"message": message,
+	})
+}
+
+func NoContent(ctx *gin.Context, message interface{}) {
+	ctx.JSON(http.StatusNoContent, gin.H{
+		"code":    "NO_CONTENT",
+		"message": message,
+	})
+}

@@ -27,6 +27,7 @@ RUN apk add --no-cache ca-certificates tzdata && \
 
 # Copy binaries and configurations
 COPY --from=builder /app/api /app/
+COPY --from=builder /app/docs /app/docs
 COPY --from=builder /app/migrations /app/migrations
 COPY --from=builder /go/bin/goose /usr/local/bin/goose
 COPY config.yaml /app/

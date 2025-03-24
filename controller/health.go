@@ -10,8 +10,7 @@ type StatusChecker interface {
 	Ping(ctx *gin.Context)
 }
 
-type statusController struct {
-}
+type statusController struct{}
 
 func NewStatusController() StatusChecker {
 	return &statusController{}

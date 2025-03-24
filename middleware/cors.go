@@ -1,10 +1,11 @@
 package middleware
 
 import (
-	"go-template/config"
-	"go-template/pkg/stringify"
 	"net/http"
 	"strings"
+
+	"go-template/config"
+	"go-template/pkg/stringify"
 
 	"github.com/gin-gonic/gin"
 )

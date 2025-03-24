@@ -3,9 +3,10 @@ package middleware
 import (
 	"bytes"
 	"encoding/json"
-	"go-template/pkg/logger"
 	"io"
 	"time"
+
+	"go-template/pkg/logger"
 
 	"github.com/gin-gonic/gin"
 	"github.com/google/uuid"

@@ -9,7 +9,7 @@ services:
       - ./config.yaml:/app/config.yaml
       - ./.air.toml:/app/.air.toml
     ports:
-      - "8085:8085"
+      - "8080:8080"
     environment:
       - APP_ENV=development
     entrypoint: >
@@ -49,7 +49,7 @@ services:
   migrations:
     build:
       context: .
-      dockerfile: dev.Dockerfile
+      dockerfile: Dockerfile
     command: > 
       sh -c "goose -dir ./migrations postgres 'user=root password=root host=db port=5432 dbname=go_web sslmode=disable' up"
     depends_on:

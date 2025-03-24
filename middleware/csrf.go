@@ -1,8 +1,9 @@
 package middleware
 
 import (
-	"go-template/config"
 	"net/http"
+
+	"go-template/config"
 
 	"github.com/gin-gonic/gin"
 )

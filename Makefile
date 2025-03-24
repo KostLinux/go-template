@@ -28,19 +28,12 @@ migrate-up:
 migrate-down:
 	@goose -dir=migrations postgres "host=${POSTGRES_HOST} user=${POSTGRES_USER} password=${POSTGRES_PASSWORD} dbname=${POSTGRES_DB} sslmode=disable" down
 
-swagger: swag redocly swag-fmt
+install-swag-deps:
+	go get -u github.com/swaggo/swag/cmd/swag
 
-swag:
-	swag init -g main.go
-
-redocly:
-	redocly build-docs docs/swagger.yaml -o docs/index.html
-
-install-swagger:
-	go install github.com/swaggo/swag/cmd/swag@latest
-
-get-swagdeps:
-	go get github.com/swaggo/swag
-
-swag-fmt:
+swagger:
 	swag fmt
+	swag init -g cmd/api/main.go -o ./docs
+
+docs: swagger
+	redocly build-docs docs/swagger.json -o docs/index.html

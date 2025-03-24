@@ -1,29 +1,36 @@
 package database
 
 import (
-	"context"
 	"fmt"
+
 	"go-template/config"
 
-	"github.com/jmoiron/sqlx"
+	"gorm.io/driver/mysql"
+	"gorm.io/driver/postgres"
+	"gorm.io/gorm"
 )
 
-// Database represents a generic database interface
-type Database interface {
-	Connect() error
-	Close() error
-	Ping(ctx context.Context) error
-	GetDB() *sqlx.DB
-}
-
-// NewConnection creates a new database connection based on driver
-func NewConnection(cfg *config.DatabaseConfig) (Database, error) {
+func NewConnection(cfg *config.DatabaseConfig) (*gorm.DB, error) {
 	switch cfg.Driver {
 	case "postgresql":
-		return NewPostgreSQL(cfg), nil
+		return connectPostgres(cfg)
 	case "mysql":
-		return NewMySQL(cfg), nil
+		return connectMySQL(cfg)
 	default:
 		return nil, fmt.Errorf("unsupported database driver: %s", cfg.Driver)
 	}
+}
+
+func connectPostgres(cfg *config.DatabaseConfig) (*gorm.DB, error) {
+	dsn := fmt.Sprintf("host=%s user=%s password=%s dbname=%s port=%d sslmode=%s",
+		cfg.Host, cfg.User, cfg.Password, cfg.Name, cfg.Port, cfg.SSLMode)
+
+	return gorm.Open(postgres.Open(dsn), &gorm.Config{})
+}
+
+func connectMySQL(cfg *config.DatabaseConfig) (*gorm.DB, error) {
+	dsn := fmt.Sprintf("%s:%s@tcp(%s:%d)/%s?charset=utf8mb4&parseTime=True&loc=Local",
+		cfg.User, cfg.Password, cfg.Host, cfg.Port, cfg.Name)
+
+	return gorm.Open(mysql.Open(dsn), &gorm.Config{})
 }
