@@ -6,13 +6,14 @@ import (
 	"log"
 	"net/http"
 	"os"
+	"os/signal"
+	"syscall"
 	"time"
 
 	"go-template/config"
 	"go-template/controller"
 	"go-template/pkg/database"
 	"go-template/pkg/logger"
-	"go-template/pkg/server"
 	"go-template/pkg/telemetry"
 	"go-template/repository"
 	"go-template/router"
@@ -78,9 +79,9 @@ func bootApp() error {
 	}
 
 	// Initialize database
-	db, err := database.NewDBManager(cfg.Database)
+	db, err := database.New(cfg.Database)
 	if err != nil {
-		return fmt.Errorf("failed to create database manager: %w", err)
+		return fmt.Errorf("failed to create database: %w", err)
 	}
 
 	if err := db.Connect(); err != nil {
@@ -131,6 +132,27 @@ func bootApp() error {
 	}()
 
 	// Wait for interrupt signal and gracefully shutdown
-	server.GracefulShutdown(srv)
+	gracefulShutdown(srv)
 	return nil
+}
+
+func gracefulShutdown(srv *http.Server) {
+	// Create channel for shutdown signals
+	quit := make(chan os.Signal, 1)
+	signal.Notify(quit, syscall.SIGINT, syscall.SIGTERM)
+
+	// Wait for shutdown signal
+	<-quit
+	log.Println("Shutting down server...")
+
+	// Create shutdown context with timeout
+	ctx, cancel := context.WithTimeout(context.Background(), 15*time.Second)
+	defer cancel()
+
+	// Attempt graceful shutdown
+	if err := srv.Shutdown(ctx); err != nil {
+		log.Printf("Server forced to shutdown: %v", err)
+	}
+
+	log.Println("Server exiting")
 }

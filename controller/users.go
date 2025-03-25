@@ -3,7 +3,6 @@ package controller
 import (
 	"errors"
 	"fmt"
-	"net/http"
 	"strconv"
 
 	"go-template/model"
@@ -60,13 +59,14 @@ func (ctrl *userController) Create(ctx *gin.Context) {
 	if err := ctrl.service.Create(ctx, user); err != nil {
 		if err.Error() == "user already exists" {
 			httpstatus.Conflict(ctx, "user already exists", err)
+			return
 		}
-
 		httpstatus.InternalServerError(ctx, "failed to create user", err)
 		return
 	}
 
-	httpstatus.Created(ctx, user)
+	resp := response.UserMapper(user)
+	httpstatus.Created(ctx, resp)
 }
 
 // Update updates an existing user
@@ -92,14 +92,20 @@ func (ctrl *userController) Update(ctx *gin.Context) {
 		return
 	}
 
-	var user model.User
-	if err := ctx.ShouldBindJSON(&user); err != nil {
+	var req request.UpdateUser
+	if err := ctx.ShouldBindJSON(&req); err != nil {
 		httpstatus.BadRequest(ctx, "invalid request", err)
 		return
 	}
-	user.ID = uint(id)
 
-	if err := ctrl.service.Update(ctx, &user); err != nil {
+	user := &model.User{
+		ID:       uint(id),
+		Name:     req.Name,
+		Email:    req.Email,
+		Password: req.Password,
+	}
+
+	if err := ctrl.service.Update(ctx, user); err != nil {
 		switch {
 		case errors.Is(err, constants.ErrNotFound):
 			httpstatus.NotFound(ctx, "user not found", err)
@@ -109,7 +115,8 @@ func (ctrl *userController) Update(ctx *gin.Context) {
 		return
 	}
 
-	ctx.JSON(http.StatusOK, user)
+	resp := response.UserMapper(user)
+	httpstatus.OK(ctx, resp)
 }
 
 // Delete removes a user
@@ -144,11 +151,10 @@ func (ctrl *userController) Delete(ctx *gin.Context) {
 		return
 	}
 
-	response := map[string]string{
-		"message": fmt.Sprintf("user %s deleted successfully", ctx.Param("id")),
+	resp := response.DeleteUser{
+		Message: fmt.Sprintf("user %d deleted successfully", id),
 	}
-
-	httpstatus.OK(ctx, response)
+	httpstatus.OK(ctx, resp)
 }
 
 // @Summary		List all users
@@ -166,8 +172,8 @@ func (ctrl *userController) Get(ctx *gin.Context) {
 		return
 	}
 
-	response := response.ToResponseList(users)
-	httpstatus.OK(ctx, response)
+	resp := response.UserListMapper(users)
+	httpstatus.OK(ctx, resp)
 }
 
 // @Summary		Get a user by ID
@@ -199,5 +205,6 @@ func (ctrl *userController) GetByID(ctx *gin.Context) {
 		return
 	}
 
-	httpstatus.OK(ctx, response.ToResponse(user))
+	resp := response.UserMapper(user)
+	httpstatus.OK(ctx, resp)
 }

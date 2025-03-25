@@ -3,53 +3,54 @@ package database
 import (
 	"context"
 	"fmt"
+	"time"
 
 	"go-template/config"
-	"go-template/model"
 
 	"gorm.io/gorm"
 )
 
-type DBManager struct {
+type Database interface {
+	Connect() error
+	Close() error
+	Ping(ctx context.Context) error
+	GetDB() *gorm.DB
+}
+
+type ConnectionManager struct {
 	db  *gorm.DB
 	cfg *config.DatabaseParams
 }
 
-func NewDBManager(cfg *config.DatabaseParams) (*DBManager, error) {
-	db, err := NewConnection(cfg)
+func (cm *ConnectionManager) Close() error {
+	sqlDB, err := cm.db.DB()
 	if err != nil {
-		return nil, fmt.Errorf("failed to create database connection: %w", err)
-	}
-
-	return &DBManager{
-		db:  db,
-		cfg: cfg,
-	}, nil
-}
-
-func (m *DBManager) Connect() error {
-	if err := m.db.AutoMigrate(&model.User{}); err != nil {
-		return fmt.Errorf("failed to migrate database: %w", err)
-	}
-	return nil
-}
-
-func (m *DBManager) Close() error {
-	sqlDB, err := m.db.DB()
-	if err != nil {
-		return err
+		return fmt.Errorf("failed to get database instance: %w", err)
 	}
 	return sqlDB.Close()
 }
 
-func (m *DBManager) Ping(ctx context.Context) error {
-	sqlDB, err := m.db.DB()
+func (cm *ConnectionManager) Ping(ctx context.Context) error {
+	sqlDB, err := cm.db.DB()
 	if err != nil {
-		return err
+		return fmt.Errorf("failed to get database instance: %w", err)
 	}
 	return sqlDB.PingContext(ctx)
 }
 
-func (m *DBManager) GetDB() *gorm.DB {
-	return m.db
+func (cm *ConnectionManager) GetDB() *gorm.DB {
+	return cm.db
+}
+
+func (cm *ConnectionManager) SetConnectionParams() error {
+	sqlDB, err := cm.db.DB()
+	if err != nil {
+		return fmt.Errorf("failed to get database instance: %w", err)
+	}
+
+	sqlDB.SetMaxIdleConns(cm.cfg.Connection.MaxIdleConns)
+	sqlDB.SetMaxOpenConns(cm.cfg.Connection.MaxOpenConns)
+	sqlDB.SetConnMaxLifetime(time.Duration(cm.cfg.Connection.ConnMaxLifetime) * time.Second)
+	sqlDB.SetConnMaxIdleTime(time.Duration(cm.cfg.Connection.ConnMaxIdleTime) * time.Second)
+	return nil
 }

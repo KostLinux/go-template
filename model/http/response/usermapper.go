@@ -2,21 +2,27 @@ package response
 
 import "go-template/model"
 
-// ToResponse converts a user model to a user response
-func ToResponse(user *model.User) User {
+// UserMapper converts a single user model to a user response
+func UserMapper(user *model.User) User {
 	return User{
-		ID:        user.ID,
-		Name:      user.Name,
-		Email:     user.Email,
-		CreatedAt: user.CreatedAt,
-		UpdatedAt: user.UpdatedAt,
+		ID:    user.ID,
+		Name:  user.Name,
+		Email: user.Email,
 	}
 }
 
-func ToResponseList(users []model.User) UserList {
-	responses := make([]User, 0, len(users))
-	for _, user := range users {
-		responses = append(responses, ToResponse(&user))
+// UserListMapper converts a slice of user models to a user list response
+func UserListMapper(users []model.User) UserList {
+	responses := make([]User, len(users))
+	for i := range users {
+		responses[i] = UserMapper(&users[i])
 	}
 	return UserList{Users: responses}
+}
+
+// SingleUserMapper converts a user pointer to a UserList with one user
+func SingleUserMapper(user *model.User) UserList {
+	return UserList{
+		Users: []User{UserMapper(user)},
+	}
 }

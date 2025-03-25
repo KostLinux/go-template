@@ -3,6 +3,6 @@ package constants
 import "errors"
 
 var (
-	ErrNotFound = errors.New("not found")
-	ErrConflict = errors.New("already exists")
+	ErrNotFound = errors.New("item not found")
+	ErrConflict = errors.New("item already exists")
 )

@@ -11,8 +11,11 @@ import (
 
 func New(cfg *config.New, controllers controller.Controllers) *gin.Engine {
 	// Create new router instance
-	router := gin.Default()
+	router := gin.New()
+	router.Use(gin.Recovery())
 	router.Use(middleware.Logger())
+
+	// Apply telemetry middleware if enabled in config
 	if cfg.Monitoring.Telemetry.Enabled {
 		router.Use(otelgin.Middleware(cfg.App.Name))
 	}

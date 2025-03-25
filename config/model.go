@@ -8,14 +8,16 @@ type New struct {
 	Monitoring *MonitoringParams `mapstructure:"monitoring"`
 }
 
-type DatabaseParams struct {
-	Driver   string `mapstructure:"driver"`
-	Host     string `mapstructure:"host"`
-	Port     int    `mapstructure:"port"`
-	User     string `mapstructure:"user"`
-	Password string `mapstructure:"password"`
-	Name     string `mapstructure:"name"`
-	SSLMode  string `mapstructure:"sslMode"`
+type AppParams struct {
+	Name    string     `mapstructure:"name"`
+	Version string     `mapstructure:"version"`
+	Port    int        `mapstructure:"port"`
+	Env     string     `mapstructure:"env"`
+	Log     *LogParams `mapstructure:"log"`
+}
+
+type LogParams struct {
+	Level string `mapstructure:"level"`
 }
 
 type HTTPParams struct {
@@ -25,16 +27,22 @@ type HTTPParams struct {
 	MaxHeaderBytes int `mapstructure:"maxHeaderBytes"`
 }
 
-type AppParams struct {
-	Name    string    `mapstructure:"name"`
-	Version string    `mapstructure:"version"`
-	Port    int       `mapstructure:"port"`
-	Env     string    `mapstructure:"env"`
-	Log     LogParams `mapstructure:"log"`
+type DatabaseParams struct {
+	Driver     string            `mapstructure:"driver"`
+	Host       string            `mapstructure:"host"`
+	Port       int               `mapstructure:"port"`
+	User       string            `mapstructure:"user"`
+	Password   string            `mapstructure:"password"`
+	Name       string            `mapstructure:"name"`
+	SSLMode    string            `mapstructure:"sslMode"`
+	Connection *ConnectionParams `mapstructure:"connection"`
 }
 
-type LogParams struct {
-	Level string `mapstructure:"level"`
+type ConnectionParams struct {
+	MaxIdleConns    int `mapstructure:"maxIdleConns"`
+	MaxOpenConns    int `mapstructure:"maxOpenConns"`
+	ConnMaxLifetime int `mapstructure:"connMaxLifetime"`
+	ConnMaxIdleTime int `mapstructure:"connMaxIdleTime"`
 }
 
 type MiddlewareParams struct {

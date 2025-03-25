@@ -1,16 +1,10 @@
 package response
 
-import (
-	"time"
-)
-
 // UserResponse represents the user response structure
 type User struct {
-	ID        uint      `json:"id" example:"1"`
-	Name      string    `json:"name" example:"John Doe"`
-	Email     string    `json:"email" example:"john@example.com"`
-	CreatedAt time.Time `json:"created_at" example:"2024-03-24T15:04:05Z"`
-	UpdatedAt time.Time `json:"updated_at" example:"2024-03-24T15:04:05Z"`
+	ID    uint   `json:"id" example:"1"`
+	Name  string `json:"name" example:"John Doe"`
+	Email string `json:"email" example:"john@example.com"`
 }
 
 // UserListResponse represents a list of users

@@ -9,9 +9,6 @@ import (
 func APIv1Router(router *gin.Engine, controllers controller.Controllers) {
 	v1 := router.Group("/api/v1")
 	{
-		// Health check endpoints
-		v1.GET("/ping", controllers.Status().Ping)
-
 		// User endpoints
 		users := v1.Group("/users")
 		{

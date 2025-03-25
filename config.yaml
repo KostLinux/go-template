@@ -23,6 +23,14 @@ database:
   name: "go_web"
   # Put SSL Mode to require for production environments
   sslMode: "disable"
+  connection:
+    maxIdleConns: 10
+    maxOpenConns: 100
+    # Set the maximum amount of time a connection may be reused.
+    # Time is in seconds.
+    connMaxLifetime: 3600
+    connMaxIdleTime: 1800
+    
 
 middleware:
   cors:
@@ -39,9 +47,11 @@ middleware:
     maxAge: 0
     domain: ""
 
+# NewRelic Example
+# License Key is revoked and needs to be replaced with your own
 monitoring:
   telemetry:
-    enabled: true
+    enabled: false
     otlp_endpoint: "otlp.eu01.nr-data.net:4317"
     otlp_headers:
       api-key: "eu01xx1954fd86db7afa2df00d5db584FFFFNRAL"

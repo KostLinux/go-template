@@ -1,44 +1,32 @@
 package database
 
 import (
-	"context"
 	"fmt"
-
 	"go-template/config"
 
-	"github.com/jmoiron/sqlx"
+	"gorm.io/driver/postgres"
+	"gorm.io/gorm"
 )
 
 type PostgreSQL struct {
-	db  *sqlx.DB
-	cfg *config.DatabaseParams
+	ConnectionManager
 }
 
-func NewPostgreSQL(cfg *config.DatabaseParams) *PostgreSQL {
-	return &PostgreSQL{cfg: cfg}
+func NewPostgreSQL(cfg *config.DatabaseParams) Database {
+	return &PostgreSQL{
+		ConnectionManager: ConnectionManager{cfg: cfg},
+	}
 }
 
-func (postgres *PostgreSQL) Connect() error {
-	dsn := fmt.Sprintf("host=%s port=%d user=%s password=%s dbname=%s sslmode=%s",
-		postgres.cfg.Host, postgres.cfg.Port, postgres.cfg.User, postgres.cfg.Password, postgres.cfg.Name, postgres.cfg.SSLMode)
+func (pg *PostgreSQL) Connect() error {
+	dsn := fmt.Sprintf("host=%s user=%s password=%s dbname=%s port=%d sslmode=%s",
+		pg.cfg.Host, pg.cfg.User, pg.cfg.Password, pg.cfg.Name, pg.cfg.Port, pg.cfg.SSLMode)
 
-	db, err := sqlx.Connect("postgres", dsn)
+	db, err := gorm.Open(postgres.Open(dsn), &gorm.Config{})
 	if err != nil {
 		return fmt.Errorf("failed to connect to postgres: %w", err)
 	}
 
-	postgres.db = db
-	return nil
-}
-
-func (postgres *PostgreSQL) Close() error {
-	return postgres.db.Close()
-}
-
-func (postgres *PostgreSQL) Ping(ctx context.Context) error {
-	return postgres.db.PingContext(ctx)
-}
-
-func (postgres *PostgreSQL) GetDB() *sqlx.DB {
-	return postgres.db
+	pg.db = db
+	return pg.SetConnectionParams()
 }
