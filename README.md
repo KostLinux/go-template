@@ -23,6 +23,7 @@ The application is built using Cloud Native Application best practices.
 - Request & Response Models
 - Hot Reload for Development (Air)
 - Migrations
+- Platform agnostic OpenTelemetry
 
 ## Getting Started
 

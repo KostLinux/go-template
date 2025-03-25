@@ -38,3 +38,15 @@ middleware:
     key: ""
     maxAge: 0
     domain: ""
+
+monitoring:
+  telemetry:
+    enabled: true
+    otlp_endpoint: "otlp.eu01.nr-data.net:4317"
+    otlp_headers:
+      api-key: "eu01xx1954fd86db7afa2df00d5db584FFFFNRAL"
+    otlp_compression: "gzip"
+    otlp_queue_size: 4094
+    otlp_max_batch_size: 1024
+    otlp_insecure: false
+    otlp_timeout: 30

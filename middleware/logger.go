@@ -89,25 +89,30 @@ func Logger() gin.HandlerFunc {
 		if ctx.Request.URL.RawQuery != "" {
 			fields["query"] = ctx.Request.URL.RawQuery
 		}
+
 		if requestBody != nil {
 			fields["request_body"] = requestBody
 		}
+
 		if responseBody != nil {
 			fields["response_body"] = responseBody
 		}
+
 		if latency := responseTime.Sub(requestTime).Milliseconds(); latency > 0 {
 			fields["latency_ms"] = latency
 		}
+
 		if err := ctx.Errors.String(); err != "" {
 			fields["error"] = err
 		}
 
 		// Log based on status code with structured fields
-		if ctx.Writer.Status() >= 500 {
+		switch status := ctx.Writer.Status(); {
+		case status >= 500:
 			logger.ErrorwFields("Request failed", fields)
-		} else if ctx.Writer.Status() >= 400 {
+		case status >= 400:
 			logger.WarnwFields("Request error", fields)
-		} else {
+		case status >= 200 && status < 400:
 			logger.InfowFields("Request completed", fields)
 		}
 	}

@@ -14,7 +14,7 @@ func ToResponse(user *model.User) User {
 }
 
 func ToResponseList(users []model.User) UserList {
-	var responses []User
+	responses := make([]User, 0, len(users))
 	for _, user := range users {
 		responses = append(responses, ToResponse(&user))
 	}

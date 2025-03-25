@@ -1,13 +1,14 @@
 package config
 
 type New struct {
-	App        AppConfig        `mapstructure:"app"`
-	HTTP       HttpConfig       `mapstructure:"http"`
-	Database   DatabaseConfig   `mapstructure:"database"`
-	Middleware MiddlewareConfig `mapstructure:"middleware"`
+	App        *AppParams        `mapstructure:"app"`
+	HTTP       *HTTPParams       `mapstructure:"http"`
+	Database   *DatabaseParams   `mapstructure:"database"`
+	Middleware *MiddlewareParams `mapstructure:"middleware"`
+	Monitoring *MonitoringParams `mapstructure:"monitoring"`
 }
 
-type DatabaseConfig struct {
+type DatabaseParams struct {
 	Driver   string `mapstructure:"driver"`
 	Host     string `mapstructure:"host"`
 	Port     int    `mapstructure:"port"`
@@ -17,31 +18,31 @@ type DatabaseConfig struct {
 	SSLMode  string `mapstructure:"sslMode"`
 }
 
-type HttpConfig struct {
+type HTTPParams struct {
 	ReadTimeout    int `mapstructure:"readTimeout"`
 	WriteTimeout   int `mapstructure:"writeTimeout"`
 	IdleTimeout    int `mapstructure:"idleTimeout"`
 	MaxHeaderBytes int `mapstructure:"maxHeaderBytes"`
 }
 
-type AppConfig struct {
+type AppParams struct {
 	Name    string    `mapstructure:"name"`
 	Version string    `mapstructure:"version"`
 	Port    int       `mapstructure:"port"`
 	Env     string    `mapstructure:"env"`
-	Log     LogConfig `mapstructure:"log"`
+	Log     LogParams `mapstructure:"log"`
 }
 
-type LogConfig struct {
+type LogParams struct {
 	Level string `mapstructure:"level"`
 }
 
-type MiddlewareConfig struct {
-	Cors CorsConfig `mapstructure:"cors"`
-	Csrf CsrfConfig `mapstructure:"csrf"`
+type MiddlewareParams struct {
+	Cors CorsParams `mapstructure:"cors"`
+	Csrf CsrfParams `mapstructure:"csrf"`
 }
 
-type CorsConfig struct {
+type CorsParams struct {
 	Enabled          bool     `mapstructure:"enabled"`
 	AllowOrigins     []string `mapstructure:"allowOrigins"`
 	AllowMethods     []string `mapstructure:"allowMethods"`
@@ -51,9 +52,25 @@ type CorsConfig struct {
 	AllowCredentials bool     `mapstructure:"allowCredentials"`
 }
 
-type CsrfConfig struct {
+type CsrfParams struct {
 	Enabled bool   `mapstructure:"enabled"`
 	Key     string `mapstructure:"key"`
 	MaxAge  int    `mapstructure:"maxAge"`
 	Domain  string `mapstructure:"domain"`
+}
+
+type MonitoringParams struct {
+	Telemetry *TelemetryParams `mapstructure:"telemetry"`
+}
+
+type TelemetryParams struct {
+	Enabled          bool              `mapstructure:"enabled"`
+	OTLPEndpoint     string            `mapstructure:"otlp_endpoint"`
+	OTLPHeaders      map[string]string `mapstructure:"otlp_headers"`
+	OTLPCompression  string            `mapstructure:"otlp_compression"`
+	OTLPQueueSize    int               `mapstructure:"otlp_queue_size"`
+	OTLPMaxBatchSize int               `mapstructure:"otlp_max_batch_size"`
+	OTLPBatchTimeout int               `mapstructure:"otlp_batch_timeout"`
+	OTLPInsecure     bool              `mapstructure:"otlp_insecure"`
+	OTLPTimeout      int               `mapstructure:"otlp_timeout"`
 }

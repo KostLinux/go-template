@@ -6,16 +6,15 @@ import (
 
 	"go-template/config"
 
-	_ "github.com/go-sql-driver/mysql"
 	"github.com/jmoiron/sqlx"
 )
 
 type MySQL struct {
 	db  *sqlx.DB
-	cfg *config.DatabaseConfig
+	cfg *config.DatabaseParams
 }
 
-func NewMySQL(cfg *config.DatabaseConfig) *MySQL {
+func NewMySQL(cfg *config.DatabaseParams) *MySQL {
 	return &MySQL{cfg: cfg}
 }
 

@@ -12,10 +12,10 @@ import (
 
 type DBManager struct {
 	db  *gorm.DB
-	cfg *config.DatabaseConfig
+	cfg *config.DatabaseParams
 }
 
-func NewDBManager(cfg *config.DatabaseConfig) (*DBManager, error) {
+func NewDBManager(cfg *config.DatabaseParams) (*DBManager, error) {
 	db, err := NewConnection(cfg)
 	if err != nil {
 		return nil, fmt.Errorf("failed to create database connection: %w", err)

@@ -7,15 +7,14 @@ import (
 	"go-template/config"
 
 	"github.com/jmoiron/sqlx"
-	_ "github.com/lib/pq"
 )
 
 type PostgreSQL struct {
 	db  *sqlx.DB
-	cfg *config.DatabaseConfig
+	cfg *config.DatabaseParams
 }
 
-func NewPostgreSQL(cfg *config.DatabaseConfig) *PostgreSQL {
+func NewPostgreSQL(cfg *config.DatabaseParams) *PostgreSQL {
 	return &PostgreSQL{cfg: cfg}
 }
 

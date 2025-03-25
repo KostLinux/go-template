@@ -13,6 +13,7 @@ import (
 	"go-template/pkg/database"
 	"go-template/pkg/logger"
 	"go-template/pkg/server"
+	"go-template/pkg/telemetry"
 	"go-template/repository"
 	"go-template/router"
 	"go-template/service"
@@ -22,6 +23,7 @@ import (
 	"github.com/gin-gonic/gin"
 	swaggerFiles "github.com/swaggo/files"
 	ginSwagger "github.com/swaggo/gin-swagger"
+	"go.opentelemetry.io/otel"
 )
 
 //	@title			Go Template API
@@ -36,21 +38,38 @@ import (
 //	@license.name	Apache 2.0
 //	@license.url	http://www.apache.org/licenses/LICENSE-2.0.html
 
-//	@host		localhost:8080
-//	@BasePath	/api/v1
+// @host		localhost:8080
+// @BasePath	/api/v1
 
 func main() {
+	if err := bootApp(); err != nil {
+		log.Printf("Application failed to start: %v", err)
+		os.Exit(1)
+	}
+}
+
+func bootApp() error {
 	// Load configuration
 	cfg, err := config.LoadConfig()
 	if err != nil {
-		log.Printf("Error loading config: %v", err)
-		os.Exit(1)
+		return fmt.Errorf("failed to load config: %w", err)
 	}
 
-	// Initialize logger
+	// Initialize logger first for proper error reporting
 	if err := logger.Setup(cfg); err != nil {
-		log.Printf("Error initializing logger: %v", err)
-		os.Exit(1)
+		return fmt.Errorf("failed to initialize logger: %w", err)
+	}
+
+	// Initialize OpenTelemetry
+	var cleanup func()
+	if cfg.Monitoring.Telemetry.Enabled {
+		cleanup = telemetry.InitTracer(cfg)
+		defer cleanup()
+
+		logger.Infof("OpenTelemetry initialized successfully")
+		logger.Infof("Verifying connection with observability provider")
+		tracer := otel.Tracer("main")
+		telemetry.VerifyConnection(context.Background(), tracer)
 	}
 
 	// Set Gin mode based on environment
@@ -59,22 +78,19 @@ func main() {
 	}
 
 	// Initialize database
-	db, err := database.NewDBManager(&cfg.Database)
+	db, err := database.NewDBManager(cfg.Database)
 	if err != nil {
-		logger.Errorf("Failed to create database manager: %v", err)
-		os.Exit(1)
+		return fmt.Errorf("failed to create database manager: %w", err)
 	}
 
 	if err := db.Connect(); err != nil {
-		logger.Errorf("Failed to connect to database: %v", err)
-		os.Exit(1)
+		return fmt.Errorf("failed to connect to database: %w", err)
 	}
 	defer db.Close()
 
 	// Test connection
 	if err := db.Ping(context.Background()); err != nil {
-		logger.Errorf("Database health check failed: %v", err)
-		os.Exit(1)
+		return fmt.Errorf("database health check failed: %w", err)
 	}
 
 	logger.Infof("Database connection established successfully")
@@ -116,4 +132,5 @@ func main() {
 
 	// Wait for interrupt signal and gracefully shutdown
 	server.GracefulShutdown(srv)
+	return nil
 }
